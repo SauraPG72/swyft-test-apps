@@ -1,0 +1,83 @@
+{
+  "_comment": "Sample structure matching illion bank statement format. Real data to be added.",
+  "statement_info": {
+    "generated_date": "2024-01-15",
+    "period_start": "2023-10-15",
+    "period_end": "2024-01-15",
+    "period_days": 92
+  },
+  "accounts": [
+    {
+      "id": "acc-001",
+      "institution": "Commonwealth Bank",
+      "account_name": "Business Transaction Account",
+      "account_type": "transaction",
+      "bsb": "063-123",
+      "account_number": "1234 5678",
+      "opening_balance": 15432.50,
+      "closing_balance": 22876.30,
+      "transactions": [
+        {
+          "id": "txn-001",
+          "date": "2023-10-16",
+          "description": "DIRECT CREDIT - CUSTOMER PAYMENT ABC PTY LTD",
+          "amount": 3500.00,
+          "balance": 18932.50,
+          "type": "credit",
+          "category": "Income - Business",
+          "category_confidence": 0.95,
+          "tags": []
+        },
+        {
+          "id": "txn-002",
+          "date": "2023-10-18",
+          "description": "TRANSFER TO SAVINGS 063-456 8765 4321",
+          "amount": -5000.00,
+          "balance": 13932.50,
+          "type": "debit",
+          "category": "Transfer - Internal",
+          "category_confidence": 0.99,
+          "linked_transaction_id": "txn-101",
+          "tags": ["internal_transfer"]
+        }
+      ]
+    },
+    {
+      "id": "acc-002",
+      "institution": "Commonwealth Bank",
+      "account_name": "Business Savings",
+      "account_type": "savings",
+      "bsb": "063-456",
+      "account_number": "8765 4321",
+      "opening_balance": 45000.00,
+      "closing_balance": 52500.00,
+      "transactions": [
+        {
+          "id": "txn-101",
+          "date": "2023-10-18",
+          "description": "TRANSFER FROM 063-123 1234 5678",
+          "amount": 5000.00,
+          "balance": 50000.00,
+          "type": "credit",
+          "category": "Transfer - Internal",
+          "category_confidence": 0.99,
+          "linked_transaction_id": "txn-002",
+          "tags": ["internal_transfer"]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_credits": 45670.00,
+    "total_debits": 38226.20,
+    "net_change": 7443.80,
+    "categories": {
+      "Income - Business": 35000.00,
+      "Income - Other": 5670.00,
+      "Transfer - Internal": 5000.00,
+      "Expenses - Operating": 18226.20,
+      "Expenses - Subscriptions": 2500.00,
+      "Transfer - Internal (Out)": 17500.00
+    }
+  }
+}
