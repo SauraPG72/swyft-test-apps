@@ -281,23 +281,40 @@ Toggle switches to show/hide specific fields in both the quotes table and email 
 - [ ] Total Hiring Installments toggle (show/hide)
 
 #### Email-Ready Quote Export
-- [ ] Formatted quote display section optimized for copy/paste into emails
-- [ ] Group quotes by Finance Amount and Asset for cleaner presentation
-- [ ] Format structure:
-  ```
-  Finance Amount: $30,000.00
-  Asset: 2024 Toyota Hilux SR5
+- [ ] **HTML Table Format** - Quotes must render as styled HTML tables that can be copied directly into email editors (Gmail, Outlook, etc.) with formatting preserved
+- [ ] Group quotes by Finance Amount and Asset
+- [ ] **Table Structure:**
 
-  Term: 60 months
-  Repayments: $650.68 (monthly) OR $300.31 (fortnightly)
-  Residual: NIL
+**Header Table (2 columns × 2 rows):**
 
-  Lender Fee: $495 (financed)
-  Origination Fee: $790 (payable at settlement)
-  Comparison Rate: 10.18%
-  ```
-- [ ] "Copy Quote to Clipboard" button that copies formatted text
-- [ ] Respect toggle settings (hide commission, rates, etc. based on toggles)
+| Field | Value |
+|-------|-------|
+| **Finance Amount** | $ 50,000.00 |
+| **Asset** | New Land Rover Defender |
+
+**Quote Option Table (2 columns × 3 rows) - repeatable:**
+
+| Field | Value |
+|-------|-------|
+| **Term** | 60 months |
+| **Repayments** | $1,031.55 (monthly) (no monthly fees) OR $476.10 (fortnightly) (no monthly fees) |
+| **Residual** | NIL |
+
+**Footer Text (below each quote option):**
+```
+Lender Fee: $ 500
+Origination Fee: $ waived
+Comparison rate: 8.62%    ← Optional (toggle)
+Base rate: 6.90%          ← Optional (toggle)
+Commissions: $ 2,020 (4%) ← Optional (toggle)
+```
+
+- [ ] Multiple quote options can be stacked under the same Finance Amount/Asset header
+- [ ] "Copy Quote to Clipboard" button that copies HTML-rich text
+- [ ] Copied content must paste correctly into email clients with table borders and formatting intact
+- [ ] Respect toggle settings (hide comparison rate, base rate, commissions based on user preferences)
+
+**Reference Implementation:** See [QuotingCalc Demo](https://saurapg72.github.io/QuotingCalc/) for an example of how the HTML copy/paste should work
 
 #### Total Hiring Installments Calculation
 ```
@@ -305,14 +322,30 @@ Total Hiring = (Monthly Payment × Term) + Balloon + Upfront Fees
 ```
 Where upfront fees are any fees marked as "payable at settlement" rather than financed.
 
+### Fee Signatures (Lender Presets)
+
+A **Fee Signature** is a preset configuration that captures a lender's specific fee structure and calculation method. Users should be able to select a fee signature, apply their base rate, and quickly generate quotes.
+
+**Example Fee Signatures:**
+
+| Lender | Fee Structure | Commission Model | Payment Timing |
+|--------|--------------|------------------|----------------|
+| **Autopay** | Daily interest, 7 days from settlement, $12.50 monthly fee | Daily interest with rate adjustment | Advance |
+| **Westpac Dealer** | $500 lender fee, no origination | Capitalised brokerage | Advance |
+| **Westpac Private** | $500 lender fee + $250 private sale fee | Capitalised brokerage | Advance |
+| **Branded Dealer** | $550 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
+| **Branded Private** | $650 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
+| **Metro** | $275 lender fee (increases to $450 with origination), $8.25 PPSR | Capitalised brokerage | Arrears |
+| **Pepper** | Varies by deal, loading factor applied | Loaded commission | Advance |
+
+- [ ] Preset fee signatures for common lenders
+- [ ] User can select fee signature → apply base rate → generate quote
+- [ ] Side-by-side comparison of same deal across different lenders
+- [ ] Ability to create custom fee signatures
+
 ### Lender Management
-- [ ] Preset lender choices pre-configured
-- [ ] Allow users to add their own custom lenders with:
-  - Lender name and logo (image upload via Supabase Storage)
-  - Establishment/lender fee (financed or upfront option)
-  - Origination fee (financed or upfront option)
-  - Monthly account fee
-  - Commission calculation method
+- [ ] Preset lender choices with fee signatures pre-configured
+- [ ] Allow users to add custom lenders/fee signatures
 - [ ] Edit and delete custom lenders
 - [ ] Store lender configurations per user in Supabase
 
@@ -322,20 +355,22 @@ Where upfront fees are any fees marked as "payable at settlement" rather than fi
 - [ ] Next.js application with proper routing
 - [ ] Supabase integration for database and authentication
 - [ ] Google OAuth working correctly
+- [ ] **Row Level Security (RLS) policies** for all database tables
+- [ ] **Security framework** - proper authentication checks, input sanitization
 - [ ] Core calculation engine matching specifications above
 - [ ] Support for all 4 commission models
-- [ ] CRUD operations for custom lenders
+- [ ] CRUD operations for custom lenders/fee signatures
 - [ ] Input validation with helpful error messages
-- [ ] Test suite validating against known correct outputs
 
 ### Should Have
+- [ ] **HTML copy/paste quote export** (see Email-Ready Quote Export section)
 - [ ] Responsive design (mobile-friendly)
 - [ ] Side-by-side comparison of multiple lenders
 - [ ] Commission comparison showing broker earnings per lender
-- [ ] Ability to save and retrieve quotes
+- [ ] Ability to save and retrieve quotes (attached to deals)
+- [ ] Test suite validating against known correct outputs
 
 ### Nice to Have
-- [ ] PDF/print-friendly quote output
 - [ ] Amortization schedule generation and display
 - [ ] Target commission calculator (reverse calculate required rate)
 - [ ] Quote history per user
@@ -355,150 +390,72 @@ For daily interest lenders, the schedule must account for:
 - Weekend/holiday adjustments for payment dates
 - The +1 day interest on first payment (settlement day counts)
 
-## Database Schema (Suggested)
+## Database Design
 
-```sql
--- Users table (handled by Supabase Auth)
+You are responsible for designing your own database schema. We intentionally do not provide a suggested schema - your schema design decisions will be evaluated as part of your submission.
 
--- Lenders table
-CREATE TABLE lenders (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES auth.users(id),
-  name TEXT NOT NULL,
-  logo_path TEXT,  -- Path to file in Supabase Storage bucket
-  is_preset BOOLEAN DEFAULT false,
-  establishment_fee DECIMAL(10,2),
-  establishment_fee_financed BOOLEAN DEFAULT true,
-  origination_fee DECIMAL(10,2),
-  origination_fee_financed BOOLEAN DEFAULT true,
-  ppsr_fee DECIMAL(10,2) DEFAULT 6.00,
-  ppsr_fee_financed BOOLEAN DEFAULT true,
-  monthly_fee DECIMAL(10,2),
-  commission_model TEXT CHECK (commission_model IN ('capitalised', 'overs', 'daily_interest', 'loaded')),
-  commission_config JSONB,  -- e.g., {"rate": 0.04} or {"base": 110, "overs_percent": 0.75}
-  interest_calculation TEXT CHECK (interest_calculation IN ('monthly', 'daily')),
-  payment_timing TEXT CHECK (payment_timing IN ('advance', 'arrears')),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
+### Required Entities (Conceptual ER Diagram)
 
--- Quotes table (optional - for saving quotes)
-CREATE TABLE quotes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES auth.users(id),
-  lender_id UUID REFERENCES lenders(id),
-  inputs JSONB NOT NULL,
-  outputs JSONB NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Quotes log table (for quote comparison feature)
-CREATE TABLE quote_logs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES auth.users(id),
-  session_id TEXT,  -- Group quotes by session
-  lender_id UUID REFERENCES lenders(id),
-  asset_description TEXT,
-  finance_amount DECIMAL(12,2),
-  term_months INTEGER,
-  payment_monthly DECIMAL(10,2),
-  payment_type TEXT CHECK (payment_type IN ('advance', 'arrears')),
-  residual_value DECIMAL(12,2),
-  base_rate DECIMAL(5,4),
-  comparison_rate DECIMAL(5,4),
-  commission_amount DECIMAL(10,2),
-  total_hiring DECIMAL(12,2),
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+```
+┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+│    User     │       │    Deal     │       │    Quote    │
+│─────────────│       │─────────────│       │─────────────│
+│ id (PK)     │──────<│ id (PK)     │>──────│ id (PK)     │
+│ ...         │       │ user_id(FK) │       │ deal_id(FK) │
+└─────────────┘       │ name        │       │ ...         │
+                      │ ...         │       └─────────────┘
+                      └─────────────┘
+                            │
+                            v
+                      ┌─────────────┐
+                      │  Quote Log  │
+                      │─────────────│
+                      │ id (PK)     │
+                      │ deal_id(FK) │
+                      │ ...         │
+                      └─────────────┘
 ```
 
-## Supabase Storage Configuration
+**Key Requirements:**
+- **Deals** - A deal has a name and unique ID. All quotes for a client/transaction are grouped under a deal.
+- **Quotes** - Individual quote calculations attached to a deal
+- **Quote Log** - History of quotes generated for a deal (viewable, deletable)
+- **Fee Signatures/Lenders** - Store lender configurations (your schema design)
 
-Lender logos are stored using Supabase Storage. Follow these steps to configure the storage bucket:
+When opening a deal, users should see all quotes made for that deal and be able to delete them.
 
-### 1. Create the Storage Bucket
-```sql
--- Run in Supabase SQL Editor
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('lender-logos', 'lender-logos', true);
-```
+---
 
-### 2. Set Up Row Level Security (RLS) Policies
-```sql
--- Allow authenticated users to upload to their own folder
-CREATE POLICY "Users can upload their own logos"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (
-  bucket_id = 'lender-logos' AND
-  (storage.foldername(name))[1] = auth.uid()::text
-);
+## Submission Requirements
 
--- Allow authenticated users to update/delete their own logos
-CREATE POLICY "Users can manage their own logos"
-ON storage.objects FOR UPDATE
-TO authenticated
-USING (
-  bucket_id = 'lender-logos' AND
-  (storage.foldername(name))[1] = auth.uid()::text
-);
+### Deployment
+- [ ] **Free Vercel deployment** - Application must be deployed and accessible
+- [ ] **Supabase free tier** - Use Supabase for database and auth (Edge Functions are free)
+- [ ] Provide the live URL in your submission
 
-CREATE POLICY "Users can delete their own logos"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (
-  bucket_id = 'lender-logos' AND
-  (storage.foldername(name))[1] = auth.uid()::text
-);
+### Video Explanation (Required)
+You must submit a **~30 minute video** covering:
 
--- Allow public read access for displaying logos
-CREATE POLICY "Anyone can view logos"
-ON storage.objects FOR SELECT
-TO public
-USING (bucket_id = 'lender-logos');
-```
+1. **Schema Design** (~10 mins)
+   - Walk through your database schema
+   - Explain your design decisions and trade-offs
+   - How you structured deals, quotes, fee signatures
 
-### 3. Storage Usage in Application
-```javascript
-// Upload logo (store in user's folder)
-async function uploadLenderLogo(userId, file) {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const filePath = `${userId}/${fileName}`;
+2. **Application Architecture** (~10 mins)
+   - How you structured the codebase
+   - Key design patterns used
+   - How you approached the calculation engine
 
-  const { data, error } = await supabase.storage
-    .from('lender-logos')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
+3. **Security & Testing** (~10 mins)
+   - RLS policies implemented
+   - Authentication flow
+   - Testing approach - Did you write E2E tests? Unit tests?
+   - How you validated calculation accuracy
 
-  if (error) throw error;
-  return filePath;
-}
-
-// Get public URL for display
-function getLenderLogoUrl(logoPath) {
-  const { data: { publicUrl } } = supabase.storage
-    .from('lender-logos')
-    .getPublicUrl(logoPath);
-  return publicUrl;
-}
-
-// Delete logo when lender is deleted
-async function deleteLenderLogo(logoPath) {
-  const { error } = await supabase.storage
-    .from('lender-logos')
-    .remove([logoPath]);
-  if (error) throw error;
-}
-```
-
-### 4. Accepted File Types
-- PNG, JPG, JPEG, SVG, WebP
-- Maximum file size: 2MB recommended
-- Recommended dimensions: 200x80px (maintains aspect ratio)
+### Code Repository
+- [ ] Private GitHub repository
+- [ ] Add `SauraPG72` as a collaborator
+- [ ] Include README with setup instructions
 
 ## Resources Provided
 

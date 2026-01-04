@@ -1,6 +1,6 @@
 # Swyft Finance - Stage 4 Technical Hiring Exercise
 
-Welcome to the Stage 4 Technical Hiring Exercise for Swyft Finance. This is a **paid 7-day technical project worth ₹50,000 INR**.
+Welcome to the Stage 4 Technical Hiring Exercise for Swyft Finance. This is a **paid 7-day technical project worth ₹5,000 INR**.
 
 ## Choose Your Project
 
@@ -45,13 +45,18 @@ Both projects are evaluated on:
 
 ## Submission
 
-1. Push code to a private GitHub repository
-2. Add `swyft-hiring` as a collaborator
-3. Include a README with:
+1. Push code to a **private** GitHub repository
+2. Add `SauraPG72` as a collaborator
+3. Deploy to **Vercel** (free tier) and provide the live URL
+4. Submit a **~30 minute video** explaining:
+   - Your database schema design decisions
+   - Application architecture
+   - Security implementation (RLS policies, auth)
+   - Testing approach (E2E, unit tests)
+5. Include a README with:
    - Setup instructions
    - Architecture decisions
    - Known limitations
-   - What you'd improve with more time
 
 ## Getting Started
 
