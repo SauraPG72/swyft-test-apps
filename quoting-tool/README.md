@@ -330,13 +330,38 @@ A **Fee Signature** is a preset configuration that captures a lender's specific 
 
 | Lender | Fee Structure | Commission Model | Payment Timing |
 |--------|--------------|------------------|----------------|
-| **Autopay** | Daily interest, 7 days from settlement, $12.50 monthly fee | Daily interest with rate adjustment | Advance |
+| **Pepper Commercial Dealer** | $499 lender fee + $6 PPSR | Loaded commission | Advance |
+| **Pepper Commercial Private** | $608 ($600 lender + $6 PPSR + $2 PPSR search) | Loaded commission | Advance |
+| **Firstmac Dealer** | $499 app fee, $8 monthly fee | Capitalised brokerage | Arrears |
+| **Firstmac Private** | $599 app fee, $8 monthly fee | Capitalised brokerage | Arrears |
 | **Westpac Dealer** | $500 lender fee, no origination | Capitalised brokerage | Advance |
 | **Westpac Private** | $500 lender fee + $250 private sale fee | Capitalised brokerage | Advance |
 | **Branded Dealer** | $550 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
 | **Branded Private** | $650 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
-| **Metro** | $275 lender fee (increases to $450 with origination), $8.25 PPSR | Capitalised brokerage | Arrears |
-| **Pepper** | Varies by deal, loading factor applied | Loaded commission | Advance |
+| **Autopay** | Lender fee $350-$550 (see below), $12.50 monthly fee, daily interest | Daily interest with rate adjustment | Advance |
+| **Metro** | Lender fee $275-$450 (see below), $8.25 PPSR | Capitalised brokerage | Arrears |
+
+**Dynamic Lender Fee Structure (Autopay & Metro):**
+
+Some lenders match the broker's origination fee dollar-for-dollar up to a cap:
+
+| Lender | Min Lender Fee | Max Lender Fee | Max Broker Origination |
+|--------|---------------|----------------|------------------------|
+| **Autopay** | $350 (even if origination is $0) | $550 | Unlimited (e.g., $990) |
+| **Metro** | $275 | $450 | $450 |
+
+*Example: If broker charges $200 origination on Autopay, lender fee = $350 + $200 = $550 (capped). If broker charges $990 origination, lender fee is still $550 (max).*
+
+**Lender Logos:**
+
+| Lender | Logo URL |
+|--------|----------|
+| Pepper | https://www.peppermoney.com.au/ |
+| Firstmac | https://www.firstmac.com.au/ |
+| Westpac | https://www.westpac.com.au/ |
+| Autopay | https://www.autopay.com.au/ |
+| Branded | https://www.brandedfinancial.com.au/ |
+| Metro | https://metrofin.com.au/ |
 
 - [ ] Preset fee signatures for common lenders
 - [ ] User can select fee signature → apply base rate → generate quote
