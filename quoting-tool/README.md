@@ -339,7 +339,7 @@ A **Fee Signature** is a preset configuration that captures a lender's specific 
 | **Branded Dealer** | $550 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
 | **Branded Private** | $650 + $6 PPSR, $8 monthly account fee | Commission overs | Advance |
 | **Autopay** | Lender fee $350-$550 (see below), $12.50 monthly fee, daily interest | Daily interest with rate adjustment | Advance |
-| **Metro** | Lender fee $275-$450 (see below), $8.25 PPSR | Capitalised brokerage | Arrears |
+| **Metro** | Lender fee $275-$450 (see below), $8.25 PPSR | Capitalised brokerage | Advance |
 
 **Dynamic Lender Fee Structure (Autopay & Metro):**
 
