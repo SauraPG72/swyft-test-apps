@@ -41,7 +41,7 @@ Both projects are evaluated on:
 
 - **Duration:** 7 days from project start
 - **Check-ins:** Daily async updates encouraged
-- **Questions:** Ask anytime via Slack/email
+- **Questions:** Ask anytime via Email
 
 ## Submission
 

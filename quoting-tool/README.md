@@ -422,18 +422,18 @@ You are responsible for designing your own database schema. We intentionally do 
 ### Required Entities (Conceptual ER Diagram)
 
 ```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│    User     │       │    Deal     │       │    Quote    │
-│─────────────│       │─────────────│       │─────────────│
-│ id (PK)     │──────<│ id (PK)     │>──────│ id (PK)     │
-│ ...         │       │ user_id(FK) │       │ deal_id(FK) │
-└─────────────┘       │ name        │       │ ...         │
-                      │ ...         │       └─────────────┘
-                      └─────────────┘
-                            │
-                            v
-                      ┌─────────────┐
-                      │  Quote Log  │
+┌─────────────┐       ┌─────────────┐       ┌──────────────────┐
+│    User     │       │    Deal     │       │    Quote         │
+│─────────────│       │─────────────│       │──────────────────│
+│ id (PK)     │──────<│ id (PK)     │       │ id (PK)          │
+│ ...         │       │ user_id(FK) │       │ quote_log_id(FK) │
+└─────────────┘       │ name        │       │ ...              │
+                      │ ...         │       └──────────────────┘
+                      └─────────────┘               | 
+                              |                     │
+                              v                     |
+                      ┌─────────────┐               | 
+                      │  Quote Log  │ <-------------l
                       │─────────────│
                       │ id (PK)     │
                       │ deal_id(FK) │
